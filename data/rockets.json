@@ -1,0 +1,40 @@
+[
+  {
+    "id": "falcon9",
+    "name": "Falcon 9",
+    "description": "Illustrative two-stage medium-lift vehicle. Rounded public-scale parameters, not a mission-specific model.",
+    "wet_mass_kg": 549054,
+    "diameter_m": 3.66,
+    "cd": 0.3,
+    "payload_kg": 15000,
+    "stages": [
+      {"name": "Stage 1", "propellant_kg": 411000, "dry_mass_kg": 22200, "thrust_sea_n": 7607000, "thrust_vac_n": 8227000, "burn_time_s": 162},
+      {"name": "Stage 2", "propellant_kg": 96000, "dry_mass_kg": 4854, "thrust_sea_n": 850000, "thrust_vac_n": 981000, "burn_time_s": 397}
+    ]
+  },
+  {
+    "id": "electron",
+    "name": "Electron",
+    "description": "Illustrative small-lift two-stage vehicle; kick stage omitted.",
+    "wet_mass_kg": 13000,
+    "diameter_m": 1.2,
+    "cd": 0.35,
+    "payload_kg": 300,
+    "stages": [
+      {"name": "Stage 1", "propellant_kg": 9250, "dry_mass_kg": 1050, "thrust_sea_n": 190000, "thrust_vac_n": 224000, "burn_time_s": 155},
+      {"name": "Stage 2", "propellant_kg": 2150, "dry_mass_kg": 250, "thrust_sea_n": 22000, "thrust_vac_n": 26000, "burn_time_s": 330}
+    ]
+  },
+  {
+    "id": "research",
+    "name": "Aster sounding rocket",
+    "description": "Fictional single-stage research vehicle for educational suborbital experiments.",
+    "wet_mass_kg": 6000,
+    "diameter_m": 0.8,
+    "cd": 0.4,
+    "payload_kg": 200,
+    "stages": [
+      {"name": "Main engine", "propellant_kg": 4800, "dry_mass_kg": 1000, "thrust_sea_n": 125000, "thrust_vac_n": 135000, "burn_time_s": 65}
+    ]
+  }
+]

@@ -1,5 +1,7 @@
+modules = ["python-base-3.13"]
 [nix]
 channel = "stable-25_05"
+packages = ["libxcrypt", "pkg-config", "xsimd"]
 
 [agent]
 expertMode = true
