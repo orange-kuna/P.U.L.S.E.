@@ -56,3 +56,7 @@ pulse/
 ├── requirements.txt        # Python dependencies
 ├── README.md               # Project documentation
 └── LICENSE                 # MIT License
+
+Note:
+=) I use replit agents to create the initial framework and then analyse every line of the code and tweak it according to the needs.
+   (Use code with caution.)
