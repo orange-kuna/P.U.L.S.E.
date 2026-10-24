@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#102b3a">
+  <title>{{ title }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="rail" aria-label="Guide navigation">
+    <a class="brand" href="/" style="color:inherit;text-decoration:none"><span class="brand-mark"><span></span></span><span class="brand-copy"><strong>P.U.L.S.E.</strong><small>FLIGHT SYSTEMS LAB</small></span></a>
+    <p class="rail-label">Workbench</p>
+    <nav class="nav-list">
+      <a class="nav-item" href="/#simulation"><span class="nav-icon">01</span> Simulation</a>
+      <a class="nav-item" href="/#atmosphere"><span class="nav-icon">02</span> Atmosphere</a>
+      <a class="nav-item" href="/#windows"><span class="nav-icon">03</span> Launch windows</a>
+      <a class="nav-item active" href="/guide"><span class="nav-icon">04</span> Model &amp; libraries</a>
+    </nav>
+    <div class="rail-spacer"></div>
+    <div class="rail-card"><div class="eyebrow">Safety boundary</div><p>This educational model is not flight-certified and must not be used for a real launch.</p><a href="/">Return to simulator →</a></div>
+    <div class="rail-foot">METHOD / DEPENDENCIES</div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="crumb"><a href="/" style="text-decoration:none">P.U.L.S.E.</a><span>/</span><b>MODEL &amp; LIBRARIES</b></div><div class="top-right"><a class="button small" href="/">Return to simulator</a></div></header>
+    <div class="page-head"><div><div class="eyebrow">Numerical method / provenance / dependencies</div><h1>How this workbench works</h1><p class="page-subtitle">A transparent educational model, not an operational launch simulator.</p></div></div>
+    <div class="caution-note" style="border:1px solid #e8ddc7;margin-bottom:15px"><span class="caution-mark">!</span><span><strong>Not flight-certified.</strong> The sample vehicle profiles are approximate and not independently verified. This software does not calculate orbital insertion, certify vehicle loads, recommend real launch windows, or establish a go/no-go decision.</span></div>
+    <section class="method-grid">
+      {% for title, body in notes %}
+      <article class="panel method-card"><div class="eyebrow">MODEL NOTE {{ "%02d"|format(loop.index) }}</div><h3>{{ title }}</h3><p>{{ body }}</p>
+      {% if loop.first %}<div class="equation">a = (T − D) / m − g(h)<br>D = ½ ρ |v − w|² Cd A<br>q = ½ ρ |v − w|²</div>{% endif %}
+      </article>
+      {% endfor %}
+    </section>
+    <section class="panel" style="margin-top:15px">
+      <div class="panel-head"><h2 class="panel-title">Every library used</h2><span class="panel-kicker">PURPOSE / VERSION / TRADE-OFFS</span></div>
+      <div class="library-list">
+        {% for lib in libraries %}
+        <a class="library-item" href="{{ lib.docs }}" target="_blank" rel="noopener noreferrer"><span><b>{{ lib.name }}</b><small>{{ lib.purpose }} {{ lib.why }} Limits: {{ lib.limits }}</small></span><span>{{ lib.version }} ↗</span></a>
+        {% endfor %}
+      </div>
+      <div class="method-note">Direct runtime dependencies and test dependency are pinned in <code>pyproject.toml</code> / <code>uv.lock</code>. Other standard-library modules used include: csv for telemetry export; datetime for UTC and forecast bounds; json for preset files and JSON export; math for kinematics; pathlib for file paths; collections/ threading for the bounded cache; and io for streaming exports. HTML, CSS and browser JavaScript are native browser features. Google Fonts are an optional visual enhancement; system fallback fonts work without them.</div>
+    </section>
+    <section class="panel" style="margin-top:15px"><div class="panel-head"><h2 class="panel-title">API &amp; local testing</h2></div><div class="method-card"><p>The simulation API is documented interactively at <a href="/docs">/docs</a>. The application exposes <code>/api/health</code>, <code>/api/config</code>, <code>/api/simulate</code>, <code>/api/weather</code> and <code>/api/windows</code>. JSON and telemetry CSV can be downloaded from the run page.</p><div class="equation">python -m pytest -q<br>uvicorn backend.main:app --host 0.0.0.0 --port 5000</div></div></section>
+    <footer class="page-foot"><span>Educational simulation only / NOT FOR FLIGHT</span><a href="/">Back to simulation</a><span>REFERENCE PROFILE ≠ VEHICLE SPECIFICATION</span></footer>
+  </main>
+</div>
+</body>
+</html>

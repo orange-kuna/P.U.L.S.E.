@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#102b3a">
+  <meta name="description" content="An educational rocket ascent simulation and atmospheric screening workbench.">
+  <title>P.U.L.S.E. — Launch simulation workbench</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/vendor/chart.umd.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="rail" aria-label="Main navigation">
+      <a class="brand" href="/" aria-label="P.U.L.S.E. home" style="color:inherit;text-decoration:none">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span class="brand-copy"><strong>P.U.L.S.E.</strong><small>FLIGHT SYSTEMS LAB</small></span>
+      </a>
+      <p class="rail-label">Workbench</p>
+      <nav class="nav-list">
+        <a class="nav-item active" href="#simulation" data-view="simulation"><span class="nav-icon">01</span> Simulation</a>
+        <a class="nav-item" href="#atmosphere" data-view="atmosphere"><span class="nav-icon">02</span> Atmosphere</a>
+        <a class="nav-item" href="#windows" data-view="windows"><span class="nav-icon">03</span> Launch windows</a>
+        <a class="nav-item" href="/guide"><span class="nav-icon">04</span> Model &amp; libraries</a>
+      </nav>
+      <div class="rail-spacer"></div>
+      <div class="rail-card">
+        <div class="eyebrow">Simulation scope</div>
+        <p>Educational local-frame ascent model. Not flight-certified or suitable for launch decisions.</p>
+        <a href="/guide">Read model limitations →</a>
+      </div>
+      <div class="rail-foot">BUILD 1.0 / EDUCATIONAL USE ONLY</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobile-menu" aria-label="Open navigation" aria-expanded="false">☰</button>
+        <div class="crumb">P.U.L.S.E. <span>/</span> <b id="crumb-title">SIMULATION</b></div>
+        <div class="top-right">
+          <span class="utc-clock" id="utc-clock" aria-label="Current UTC time"></span>
+          <span class="connection"><i></i><span id="connection-label">CONNECTING</span></span>
+        </div>
+      </header>
+
+      <div class="error-banner" id="error-banner" role="alert" aria-live="polite">
+        <strong id="error-title">Request failed</strong><span id="error-message"></span>
+      </div>
+      <div class="loading-strip" id="loading-strip" aria-label="Loading" role="progressbar"></div>
+
+      <section class="view active" id="view-simulation" aria-labelledby="simulation-title">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Trajectory / screening / educational model</div>
+            <h1 id="simulation-title">Flight simulation</h1>
+            <p class="page-subtitle">Explore how atmosphere and vehicle inputs shape a local-frame ascent.</p>
+          </div>
+          <div class="head-actions">
+            <button class="button" id="export-csv" disabled>Export telemetry CSV</button>
+            <button class="button" id="export-json" disabled>Download run JSON</button>
+          </div>
+        </div>
+        <div class="workspace-grid">
+          <section class="panel config-panel">
+            <div class="panel-head"><h2 class="panel-title">Mission parameters</h2><span class="panel-kicker">MODEL INPUT</span></div>
+            <form class="form-body" id="simulation-form">
+              <div class="field">
+                <label for="profile">Vehicle profile <span>Illustrative</span></label>
+                <select id="profile" name="profile_id"></select>
+                <div class="field-help" id="profile-description"></div>
+              </div>
+              <div class="field">
+                <label for="site">Launch site</label>
+                <select id="site" name="site_id"></select>
+              </div>
+              <div class="field">
+                <label>Atmosphere input</label>
+                <div class="weather-toggle">
+                  <label><input type="radio" name="weather_mode" value="standard" checked><span>Standard model</span></label>
+                  <label><input type="radio" name="weather_mode" value="live"><span>Live forecast</span></label>
+                </div>
+                <div class="field-help">Live mode requires Open-Meteo internet access.</div>
+              </div>
+              <div class="field">
+                <label for="launch-time">Forecast time <span>Optional</span></label>
+                <input id="launch-time" type="datetime-local" aria-describedby="launch-help">
+                <div class="field-help" id="launch-help">Leave blank for the nearest forecast hour.</div>
+              </div>
+              <div class="form-divider">Ascent configuration</div>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="duration">Duration <output id="duration-output">420 s</output></label>
+                  <input id="duration" type="range" min="60" max="900" step="30" value="420">
+                </div>
+                <div class="field">
+                  <label for="throttle">Throttle <output id="throttle-output">100%</output></label>
+                  <input id="throttle" type="range" min="0.5" max="1" step="0.05" value="1">
+                </div>
+                <div class="field">
+                  <label for="pitch">Final pitch <output id="pitch-output">70°</output></label>
+                  <input id="pitch" type="range" min="0" max="85" step="1" value="70">
+                </div>
+                <div class="field">
+                  <label for="heading">Heading <output id="heading-output">90°</output></label>
+                  <input id="heading" type="range" min="0" max="360" step="1" value="90">
+                </div>
+                <div class="field">
+                  <label for="q-limit">Max-Q limit <output id="q-limit-output">50 kPa</output></label>
+                  <input id="q-limit" type="range" min="5" max="100" step="1" value="50">
+                </div>
+                <div class="field">
+                  <label for="wind-limit">Wind limit <output id="wind-limit-output">35 m/s</output></label>
+                  <input id="wind-limit" type="range" min="5" max="100" step="1" value="35">
+                </div>
+              </div>
+              <button class="button primary form-submit" id="run-simulation" type="submit">Run simulation <span aria-hidden="true">→</span></button>
+            </form>
+            <div class="caution-note"><span class="caution-mark">!</span><span>Illustrative presets are not manufacturer-verified. Results are not flight guidance, a launch decision, or structural certification.</span></div>
+          </section>
+
+          <div class="results" id="results" aria-live="polite">
+            <div class="metrics">
+              <article class="metric"><div class="metric-label">Peak altitude</div><div class="metric-value" id="metric-altitude">—<span class="metric-unit">km</span></div><div class="metric-caption">MAX DURING RUN</div></article>
+              <article class="metric"><div class="metric-label">Peak velocity</div><div class="metric-value" id="metric-velocity">—<span class="metric-unit">m/s</span></div><div class="metric-caption">AIR-RELATIVE FRAME</div></article>
+              <article class="metric"><div class="metric-label">Maximum Q</div><div class="metric-value" id="metric-q">—<span class="metric-unit">kPa</span></div><div class="metric-caption" id="metric-q-caption">DYNAMIC PRESSURE</div></article>
+              <article class="metric"><div class="metric-label">Heating proxy</div><div class="metric-value" id="metric-heat">—<span class="metric-unit">kW/m²</span></div><div class="metric-caption">1 M NOSE-RADIUS ASSUMPTION</div></article>
+            </div>
+
+            <div class="chart-grid">
+              <section class="panel chart-panel">
+                <div class="panel-head"><h2 class="panel-title">Altitude &amp; speed</h2><span class="panel-kicker">BY ELAPSED TIME · SEPARATE AXES</span></div>
+                <div class="chart-wrap"><canvas id="flight-chart" role="img" aria-label="Altitude and speed over time"></canvas></div>
+              </section>
+              <section class="panel chart-panel">
+                <div class="panel-head"><h2 class="panel-title">Dynamic pressure</h2><span class="panel-kicker">KPA BY ELAPSED TIME</span></div>
+                <div class="chart-wrap"><canvas id="q-chart" role="img" aria-label="Dynamic pressure over time"></canvas></div>
+              </section>
+            </div>
+            <section class="panel trajectory-panel">
+              <div class="panel-head"><h2 class="panel-title">Ground track projection</h2><span class="panel-kicker">LOCAL DOWNRANGE × ALTITUDE · NO MAP</span></div>
+              <div class="trajectory-wrap" id="trajectory" role="img" aria-label="Calculated downrange versus altitude"></div>
+            </section>
+            <section class="panel risk-row">
+              <div class="risk-overall">
+                <div class="eyebrow">Screening status</div>
+                <div class="risk-status"><i class="status-dot caution" id="risk-dot"></i><span id="risk-overall">Awaiting run</span></div>
+                <div class="risk-caption" id="risk-caption">Screening status is not launch clearance.</div>
+              </div>
+              <div class="risk-checks" id="risk-checks"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-head"><h2 class="panel-title">Flight events</h2><span class="panel-kicker">INTEGRATION TIMELINE</span></div>
+              <div class="events-list" id="events-list"></div>
+            </section>
+            <div class="result-meta"><span id="run-meta">Waiting for simulation</span><span id="model-meta">No external weather used</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-atmosphere" aria-labelledby="atmosphere-title">
+        <div class="page-head">
+          <div><div class="eyebrow">Observed forecast / modeled reference</div><h1 id="atmosphere-title">Atmosphere profile</h1>
+            <p class="page-subtitle">Inspect the vertical layers used by the latest simulation; fetch a forecast explicitly.</p></div>
+          <div class="head-actions"><button class="button primary" id="refresh-weather">Fetch live forecast</button></div>
+        </div>
+        <div class="secondary-grid">
+          <section class="weather-hero" id="weather-hero">
+            <div class="weather-hero-top"><div><div class="eyebrow">Atmospheric input</div><div class="weather-temp" id="weather-temp">—</div><div class="weather-desc" id="weather-description">Run a simulation to view the atmosphere.</div></div><div class="badge" id="weather-source">NOT LOADED</div></div>
+            <div class="weather-readings" id="weather-readings"></div>
+          </section>
+          <section class="panel"><div class="panel-head"><h2 class="panel-title">Data provenance</h2><span class="panel-kicker">SOURCE MATTERS</span></div><div class="method-note" id="weather-note">Atmosphere metadata appears with simulation results. Standard atmosphere is a model, not a weather observation.</div></section>
+        </div>
+        <section class="panel" style="margin-top:15px">
+          <div class="panel-head"><h2 class="panel-title">Vertical sounding layers</h2><span class="panel-kicker">PRESSURE LEVELS · HEIGHT ASL</span></div>
+          <div class="data-table-wrap"><table class="data-table atmo-table"><thead><tr><th>Altitude</th><th>Pressure</th><th>Temp.</th><th>Density</th><th>E wind</th><th>N wind</th><th>Speed</th></tr></thead><tbody id="atmo-rows"><tr><td colspan="7" class="forecast-state">Run a simulation or explicitly request a forecast to load the atmospheric layers.</td></tr></tbody></table></div>
+          <div class="method-note" id="atmo-method">Altitude above sea level; pressure levels are approximate forecast model data, not a weather balloon sounding.</div>
+        </section>
+      </section>
+
+      <section class="view" id="view-windows" aria-labelledby="windows-title">
+        <div class="page-head"><div><div class="eyebrow">Forecast hours / relative ranking</div><h1 id="windows-title">Launch window scan</h1>
+          <p class="page-subtitle">Compare forecast weather penalties at the selected site. No operational go/no-go advice.</p></div>
+          <div class="head-actions"><button class="button primary" id="scan-windows">Scan forecast hours</button></div>
+        </div>
+        <div class="panel" style="margin-bottom:15px">
+          <div class="panel-head"><h2 class="panel-title">Forecast comparison</h2><span class="panel-kicker">12 SAMPLES · 36 HOURS</span></div>
+          <div id="windows-state" class="forecast-state"><strong>Forecast not loaded</strong>Select the site in Simulation, then scan to compare the next 36 hours. This calls Open-Meteo.</div>
+          <div id="window-list" class="window-list"></div>
+          <div class="method-note" id="window-method">No results yet. Forecast fetch errors are shown explicitly; no standard-atmosphere fallback is used.</div>
+        </div>
+      </section>
+
+      <footer class="page-foot"><span>Educational simulation only / NOT FOR FLIGHT OR LAUNCH DECISIONS</span><a href="/guide">Model, limitations &amp; library details</a><span>WEATHER: OPEN-METEO · CC BY 4.0</span></footer>
+    </main>
+  </div>
+</body>
+</html>
